@@ -234,7 +234,7 @@ const frameWidth2Grid = frameWidth => {
  * input @素材最大时刻 materialMaxFrame
  * output @时间轴格子数量 girdTotalNumber
  */
-const gridTotalNumber = (frameWidth, timeLineWidth, materialMaxFrame) => {
+const getGridTotalNumber = (frameWidth, timeLineWidth, materialMaxFrame) => {
     // 格宽度
     const gridWidth = frameWidth2Grid(frameWidth).gridWidth;
 
@@ -248,10 +248,8 @@ const gridTotalNumber = (frameWidth, timeLineWidth, materialMaxFrame) => {
     const materialGridNumber = (materialMaxFrame, frameWidth, gridWidth) => {
         // 素材宽度
         const materialWidth = materialMaxFrame * frameWidth;
-
         // 素材格数（向上取整）
         const materialGridNumber = Math.ceil(materialWidth / gridWidth);
-
         return materialGridNumber;
     };
 
@@ -274,27 +272,12 @@ const getTimeScaleWidth = (frameWidth, timeLineWidth, materialMaxFrame) => {
     // 格宽度
     const gridWidth = frameWidth2Grid(frameWidth).gridWidth;
 
-    // 计算一屏幕有多少格
-    const oneScreenGridNumber = Math.floor(timeLineWidth / gridWidth);
-
-    // 计算空白处有多少格
-    const emptyScreenGridNumber = Math.floor(oneScreenGridNumber / 3);
-
-    // 计算素材有多少格
-    const materialGridNumber = (materialMaxFrame, frameWidth, gridWidth) => {
-        // 素材宽度
-        const materialWidth = materialMaxFrame * frameWidth;
-
-        // 素材格数（向上取整）
-        const materialGridNumber = Math.ceil(materialWidth / gridWidth);
-
-        return materialGridNumber;
-    };
-
     // 总格数
-    const gridTotalNumber =
-        emptyScreenGridNumber +
-        materialGridNumber(materialMaxFrame, frameWidth, gridWidth);
+    const gridTotalNumber = getGridTotalNumber(
+        frameWidth,
+        timeLineWidth,
+        materialMaxFrame
+    );
 
     const result = gridTotalNumber * gridWidth;
     return timeLineWidth >= result ? timeLineWidth : result;
@@ -306,12 +289,12 @@ const getTimeScalePlaceHolderWidth = (offsetLeft, gridWidth) =>
 // 当前绘制的是第几个格子
 const gridBufferFirstIndex = (offsetLeft, gridWidth) => {
     const placeholderWidth = Math.floor(offsetLeft / gridWidth) * gridWidth;
-    return placeholderWidth / gridWidth + 1;
+    return Math.floor(placeholderWidth / gridWidth) + 1;
 };
 
 // 格子缓存数量
-const getGridBufferNumber = (timescale_width, gridWidth) =>
-    Math.ceil(timescale_width / gridWidth) + 1;
+const getGridBufferNumber = (timeLine_width, gridWidth) =>
+    Math.ceil(timeLine_width / gridWidth) + 1;
 
 /**
  * 渲染格子
@@ -328,7 +311,7 @@ const renderGridBufferList = (
     groupGridFrame,
     gridFrame,
     timeLineOffsetLeft,
-    timescale_width
+    timeLine_width
 ) => {
     try {
         // 获取格子倍数；例如：2 倍，就是 2 的倍数都会绘制大格
@@ -338,7 +321,7 @@ const renderGridBufferList = (
         const firstIndex = gridBufferFirstIndex(timeLineOffsetLeft, gridWidth);
 
         // 结束位置
-        const gridBufferNumber = getGridBufferNumber(timescale_width, gridWidth);
+        const gridBufferNumber = getGridBufferNumber(timeLine_width, gridWidth);
 
         // 动态计算数组长度
         if (gridBufferNumber > gridBufferList.value.length) {
@@ -436,13 +419,9 @@ const getMaxFrameOfMaterial = (coreData, currentSectionIndex) => {
         coreData.sections[currentSectionIndex - 1].sectionTimeline.visionTrack
             .visionTrackMaterials;
 
-    console.log("visionTrackMaterials", visionTrackMaterials);
-
     const audioTrackMaterials =
-        coreData.sections[currentSectionIndex - 1].sectionTimeline.visionTrack
+        coreData.sections[currentSectionIndex - 1].sectionTimeline.audioTrack
             .audioTrackMaterials;
-
-    console.log("audioTrackMaterials", audioTrackMaterials);
 
     let maxTimeLineOut = 0;
     if (visionTrackMaterials) {
@@ -465,8 +444,8 @@ const getMaxFrameOfMaterial = (coreData, currentSectionIndex) => {
         }
     }
 
-    return visionTrackMaterials.length === 0
-        ? 293333.333333
+    return visionTrackMaterials.length === 0 && audioTrackMaterials.length === 0
+        ? 0
         : μs2Frame(maxTimeLineOut, 30);
 };
 
@@ -474,7 +453,7 @@ export default {
     calcTimeLineContainerWidth,
     frame2Time,
     frameWidth2Grid,
-    gridTotalNumber,
+    getGridTotalNumber,
     getTimeScaleWidth,
     getTimeScalePlaceHolderWidth,
     gridBufferFirstIndex,

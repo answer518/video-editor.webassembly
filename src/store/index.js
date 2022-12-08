@@ -338,7 +338,7 @@ function useProvider() {
     const $timeLine_width = ref(0);
     const $timescale_width = ref(0);
     const $timescale_placeholder_width = ref(0);
-    const $maxFrameWidth = Mapping.getMaxFrameWidth();
+    const $maxFrameWidth = ref(Mapping.getMaxFrameWidth());
     const $minFrameWidth = ref(0);
     const $fitFrameWidth = ref(0);
     const $maxFrameOfMaterial = ref(0);

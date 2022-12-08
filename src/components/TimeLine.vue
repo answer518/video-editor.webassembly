@@ -118,7 +118,20 @@
 
       <div>
         <!-- 放大时间轴 -->
-        <div class="top-button-right" @click="clickZoomIn">
+        <div
+          class="top-button-right"
+          @click="clickZoomIn"
+          :style="{
+            pointerEvents:
+              maxFrameOfMaterial === 0 || frameWidth === maxFrameWidth
+                ? 'none'
+                : 'auto',
+            opacity:
+              maxFrameOfMaterial === 0 || frameWidth === maxFrameWidth
+                ? 0.2
+                : 1,
+          }"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.553"
@@ -136,7 +149,20 @@
         </div>
 
         <!-- 缩小时间轴 -->
-        <div class="top-button-right" @click="clickZoomOut">
+        <div
+          class="top-button-right"
+          @click="clickZoomOut"
+          :style="{
+            pointerEvents:
+              maxFrameOfMaterial === 0 || frameWidth === minFrameWidth
+                ? 'none'
+                : 'auto',
+            opacity:
+              maxFrameOfMaterial === 0 || frameWidth === minFrameWidth
+                ? 0.2
+                : 1,
+          }"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.553"
@@ -154,7 +180,14 @@
         </div>
 
         <!-- 合适的时间轴 -->
-        <div class="top-button-right" @click="clickZoomFit">
+        <div
+          class="top-button-right"
+          @click="clickZoomFit"
+          :style="{
+            pointerEvents: maxFrameOfMaterial === 0 ? 'none' : 'auto',
+            opacity: maxFrameOfMaterial === 0 ? 0.5 : 1,
+          }"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.583"
@@ -183,7 +216,6 @@
     >
       <!-- 左部操作区域 -->
       <div class="left-operation-area" :style="{ width: '37px' }"></div>
-
       <!-- 时间轴 -->
       <div
         class="timeline"
@@ -279,6 +311,8 @@ const maxFrameWidth = inject(Store.maxFrameWidth);
 // 合适帧宽度
 const fitFrameWidth = inject(Store.fitFrameWidth);
 
+// 当前素材最大帧数
+const maxFrameOfMaterial = inject(Store.maxFrameOfMaterial);
 /** 依赖注入 end */
 
 /** 点击事件 start */
@@ -305,7 +339,7 @@ watchEffect(() => {
     groupGridFrame.value,
     gridFrame.value,
     timeLineOffsetLeft.value,
-    timescale_width.value
+    timeLine_width.value
   );
 });
 
