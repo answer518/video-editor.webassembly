@@ -1,19 +1,16 @@
-# Web Video Editor
-## Preview
-https://ishaolizhi.file.hearfresh.cn/neAJ9oRrMnnsWqjNypJRr5UGWrXAR0Qn/1.mp4
+# 视频编辑器
 
-## Feature
-- Upload File And Read Frame
-- TimeLine Dynamic Cache Loading Frame
-- JUST LIKE 剪映's TIMELINE
+## 技术栈
 
-## Tech Stack
-- WebAssmeble：C / C++ working in JavaScript for read frames from video
+- WebAssmeble：C / C++ working in JavaScript
+- Emscripten: turn C / C++ to WASM
 - FFmpeg：library for video editing
-- Vue3 + JavaScript
-- MY GENIUS SELF-DEVELOPED TIMELINE FRAMEWORK
+- H5 Canvas
+- H5 Video Blob
+- H5 Web Worker
 
-## How To Start Using
+## 如何运行
+
 ```
 $ npm install
 $ npm run serve

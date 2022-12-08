@@ -1,22 +1,17 @@
-import { createRouter, createWebHashHistory } from "vue-router";
-import VideoEditor from "../views/VideoEditor.vue";
+import { createRouter, createWebHashHistory } from 'vue-router'
+import VideoEditor from '../views/VideoEditor.vue'
 
 const routes = [
-  {
-    path: "/",
-    name: "viedoeditor",
-    component: VideoEditor
-  },
-  {
-    path: "/test",
-    name: "testview",
-    component: () => import("../views/TestView.vue")
-  }
-];
+    {
+        path: '/',
+        name: 'video-editor',
+        component: VideoEditor
+    }
+]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes
-});
+    history: createWebHashHistory(),
+    routes
+})
 
-export default router;
+export default router
