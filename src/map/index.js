@@ -331,15 +331,6 @@ const renderGridBufferList = (
     timescale_width
 ) => {
     try {
-        console.log(
-            gridBufferList,
-            gridWidth,
-            groupGridFrame,
-            gridFrame,
-            timeLineOffsetLeft,
-            timescale_width
-        );
-
         // 获取格子倍数；例如：2 倍，就是 2 的倍数都会绘制大格
         const gridMultiple = groupGridFrame / gridFrame;
 
@@ -366,7 +357,6 @@ const renderGridBufferList = (
             // doing nothing
         }
 
-        console.log("渲染开始");
         // 渲染过程
         for (let i = firstIndex; i <= gridBufferNumber + firstIndex - 1; i++) {
             const grid = gridBufferList.value[i - firstIndex];
@@ -390,6 +380,96 @@ const renderGridBufferList = (
     }
 };
 
+/**
+ * 获取时间轴最小帧宽度
+ * @param {number} maxMaterialFrame 时间轴上素材的最大帧数，单位 frame
+ * @param {number} timeLineWidth 时间轴的长度，单位 px
+ * @returns
+ */
+const getMinFrameWidth = (maxMaterialFrame, timeLineWidth) => {
+    const maxMaterialFrameWidth = timeLineWidth * (1 / 3);
+    return maxMaterialFrameWidth / maxMaterialFrame;
+};
+
+/**
+ * 获取时间轴合适帧宽度
+ * 常量：200px
+ */
+const getMaxFrameWidth = () => 200;
+
+/**
+ * 获取时间轴合适帧宽度
+ * @param {number} maxMaterialFrame
+ * @param {number} timeLineWidth
+ * @returns
+ */
+const getFitFrameWidth = (maxMaterialFrame, timeLineWidth) => {
+    const maxMaterialFrameWidth = timeLineWidth * (4 / 5);
+    return maxMaterialFrameWidth / maxMaterialFrame;
+};
+
+/**
+ * 微秒转帧数
+ * @param {*} μs 需要转换的微秒数
+ * @param {number} fps 帧率
+ * @returns 帧数
+ */
+const μs2Frame = (ms, fps) => ms * (fps / 1000000);
+
+/**
+ * 获取时间轴上，视觉素材的宽度
+ * @param {number} timeLineIn 素材在时间轴上的入点
+ * @param {*} timeLineOut 素材在时间轴上的出点
+ * @param {*} frameWidth 帧宽度
+ * @returns
+ */
+const getVideoItemWidth = (timeLineIn, timeLineOut, frameWidth) =>
+    μs2Frame(timeLineOut - timeLineIn, 30) * frameWidth;
+
+/**
+ *  获取当前最大的素材占据的帧
+ * @param {Object} coreData 核心数据
+ */
+// TODO 本函数目前仅仅计算了视频中的最大素材，实际上应该计算全部素材的最大素材
+const getMaxFrameOfMaterial = (coreData, currentSectionIndex) => {
+    const visionTrackMaterials =
+        coreData.sections[currentSectionIndex - 1].sectionTimeline.visionTrack
+            .visionTrackMaterials;
+
+    console.log("visionTrackMaterials", visionTrackMaterials);
+
+    const audioTrackMaterials =
+        coreData.sections[currentSectionIndex - 1].sectionTimeline.visionTrack
+            .audioTrackMaterials;
+
+    console.log("audioTrackMaterials", audioTrackMaterials);
+
+    let maxTimeLineOut = 0;
+    if (visionTrackMaterials) {
+        for (let i = 0; i < visionTrackMaterials.length; i++) {
+            const timeLineOut = visionTrackMaterials[i].timeLineOut;
+            if (timeLineOut > maxTimeLineOut) {
+                maxTimeLineOut = timeLineOut;
+            }
+        }
+    }
+
+    if (audioTrackMaterials) {
+        for (let i = 0; i < audioTrackMaterials.length; i++) {
+            if (audioTrackMaterials[i].voiceType !== "bgm") {
+                const timeLineOut = audioTrackMaterials[i].timeLineOut;
+                if (timeLineOut > maxTimeLineOut) {
+                    maxTimeLineOut = timeLineOut;
+                }
+            }
+        }
+    }
+
+    return visionTrackMaterials.length === 0
+        ? 293333.333333
+        : μs2Frame(maxTimeLineOut, 30);
+};
+
 export default {
     calcTimeLineContainerWidth,
     frame2Time,
@@ -398,5 +478,11 @@ export default {
     getTimeScaleWidth,
     getTimeScalePlaceHolderWidth,
     gridBufferFirstIndex,
-    renderGridBufferList
+    renderGridBufferList,
+    getMinFrameWidth,
+    getMaxFrameWidth,
+    getFitFrameWidth,
+    μs2Frame,
+    getVideoItemWidth,
+    getMaxFrameOfMaterial
 };

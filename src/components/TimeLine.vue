@@ -3,7 +3,7 @@
     class="timeline-container"
     :style="{ width: timeLineContainer_width + 'px' }"
   >
-    <!-- 顶部操作按钮区域 -->
+    <!-- 顶部操作区域 -->
     <section class="top-operation-area">
       <div>
         <div class="top-button-left">
@@ -117,7 +117,8 @@
       </div>
 
       <div>
-        <div class="top-button-right">
+        <!-- 放大时间轴 -->
+        <div class="top-button-right" @click="clickZoomIn">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.553"
@@ -134,7 +135,8 @@
           </svg>
         </div>
 
-        <div class="top-button-right">
+        <!-- 缩小时间轴 -->
+        <div class="top-button-right" @click="clickZoomOut">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.553"
@@ -151,7 +153,8 @@
           </svg>
         </div>
 
-        <div class="top-button-right">
+        <!-- 合适的时间轴 -->
+        <div class="top-button-right" @click="clickZoomFit">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="10.583"
@@ -187,6 +190,7 @@
         :style="{ width: timeLine_width + 'px' }"
         ref="timeLine"
       >
+        <!-- 时间轴刻度 -->
         <div class="timescale" :style="{ width: timescale_width + 'px' }">
           <!-- 宽度占位 -->
           <div
@@ -203,6 +207,16 @@
             :showNumber="grid.showNumber"
           ></time-grid>
         </div>
+
+        <!-- 时间轴的视频容器 -->
+        <div class="video-line" :style="{ width: timescale_width + 'px' }">
+          <video-item
+            v-for="item in coreData.sections[currentSectionIndex - 1]
+              .sectionTimeline.visionTrack.visionTrackMaterials"
+            :key="item"
+            :visionTrackMaterials="item"
+          ></video-item>
+        </div>
       </div>
     </section>
   </div>
@@ -210,9 +224,15 @@
 
 <script setup>
 import Store from "@/store";
-import { inject, ref, onMounted, watchEffect } from "vue";
+import { inject, ref, onMounted, computed, watchEffect } from "vue";
 import TimeGrid from "@/components/TimeGrid.vue";
+import VideoItem from "@/components/VideoItem.vue";
 import Mapping from "@/map";
+import { TimeLine } from "@/viewmodels";
+
+// 核心数据
+const coreData = inject(Store.coreData);
+
 // 帧宽度：决定了时间轴的比例
 const frameWidth = inject(Store.frameWidth);
 
@@ -222,25 +242,61 @@ const timeLine = ref(null);
 // timescale's grid
 const gridBufferList = ref([]);
 
-console.log("shit", frameWidth);
+/** 依赖注入 start */
 // 时间轴容器的宽度
 const timeLineContainer_width = inject(Store.timeLineContainer_width);
 
 // 时间轴滚动轴左偏移量
 const timeLineOffsetLeft = inject(Store.timeLineOffsetLeft);
+
 // 时间轴宽度：用户能看见的宽度
 const timeLine_width = inject(Store.timeLine_width);
+
 // 时间刻度总宽度：包含用户看不见的宽度
 const timescale_width = inject(Store.timescale_width);
+
 // 时间刻度左侧占位的宽度
 const timescale_placeholder_width = inject(Store.timescale_placeholder_width);
 
 // 当前格子宽度
 const gridWidth = inject(Store.gridWidth);
+
 // 格子内帧数
 const gridFrame = inject(Store.gridFrame);
+
 // 每组格子内的帧数
 const groupGridFrame = inject(Store.groupGridFrame);
+
+// 段落级焦点
+const currentSectionIndex = inject(Store.currentSectionIndex);
+
+// 最小帧宽度
+const minFrameWidth = inject(Store.minFrameWidth);
+
+// 最大帧宽度
+const maxFrameWidth = inject(Store.maxFrameWidth);
+
+// 合适帧宽度
+const fitFrameWidth = inject(Store.fitFrameWidth);
+
+/** 依赖注入 end */
+
+/** 点击事件 start */
+// 点击放大
+const clickZoomIn = () => {
+  TimeLine.zoomIn(frameWidth, maxFrameWidth);
+};
+
+// 点击缩小
+const clickZoomOut = () => {
+  TimeLine.zoomOut(frameWidth, minFrameWidth);
+};
+
+// 点击缩放到合适
+const clickZoomFit = () => {
+  TimeLine.zoomFit(frameWidth, fitFrameWidth);
+};
+
 watchEffect(() => {
   // 渲染 gridBufferList
   Mapping.renderGridBufferList(
@@ -281,16 +337,19 @@ onMounted(() => {
   border-top: 1px solid #1a1a1a;
   display: flex;
   flex-direction: column;
+
   .top-operation-area {
     height: 31px;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     div {
       display: flex;
       align-items: center;
     }
+
     .top-button-left {
       width: 26px;
       height: 20px;
@@ -300,10 +359,12 @@ onMounted(() => {
       margin-left: 8px;
       border-radius: 5px;
       cursor: pointer;
+
       &:hover {
         background: #1b1b1b;
       }
     }
+
     .top-button-right {
       width: 26px;
       height: 20px;
@@ -314,6 +375,7 @@ onMounted(() => {
       margin-right: 8px;
       border-radius: 5px;
       cursor: pointer;
+
       &:hover {
         background: #1b1b1b;
       }
@@ -323,6 +385,7 @@ onMounted(() => {
   .left-operation-area {
     height: 100%;
   }
+
   .timeline {
     width: calc(100% - 37px);
     height: 100%;
@@ -332,6 +395,13 @@ onMounted(() => {
     box-shadow: inset 3px -3px 3px rgba(0, 0, 0, 0.1);
 
     .timescale {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .video-line {
+      margin-top: 15px;
+      height: 72px;
       display: flex;
       flex-direction: row;
     }
