@@ -1,11 +1,12 @@
-import { provide } from 'vue'
+import { provide, ref } from 'vue'
 
-const hello = Symbol()
+const timeLineWidth = Symbol()
 
 function useProvider() {
-    provide(hello)
+    provide(timeLineWidth, ref(0))
 }
 
 export default {
-    useProvider
+    useProvider,
+    timeLineWidth
 }

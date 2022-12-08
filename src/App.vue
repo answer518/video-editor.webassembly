@@ -1,10 +1,11 @@
 <template>
-  <router-view />
+  <video-editor></video-editor>
 </template>
 <script setup>
 import Store from "@/store";
+import VideoEditor from "@/views/VideoEditor.vue";
 
-// 提供全局依赖注入
+// 提供依赖注入
 Store.useProvider();
 </script>
 <style>
@@ -15,5 +16,9 @@ body {
 #app {
   width: 100vw;
   height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
 }
 </style>
