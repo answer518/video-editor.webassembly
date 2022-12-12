@@ -400,10 +400,17 @@ const getFitFrameWidth = (maxMaterialFrame, timeLineWidth) => {
 const μs2Frame = (ms, fps) => ms * (fps / 1000000);
 
 /**
+ * 帧数转毫秒
+ * @param {*} frame
+ * @param {*} fps
+ */
+const frame2ms = (frame, fps) => (frame / fps) * 1000;
+
+/**
  * 获取时间轴上，视觉素材的宽度
  * @param {number} timeLineIn 素材在时间轴上的入点
- * @param {*} timeLineOut 素材在时间轴上的出点
- * @param {*} frameWidth 帧宽度
+ * @param {number} timeLineOut 素材在时间轴上的出点
+ * @param {number} frameWidth 帧宽度
  * @returns
  */
 const getVideoItemWidth = (timeLineIn, timeLineOut, frameWidth) =>
@@ -449,6 +456,8 @@ const getMaxFrameOfMaterial = (coreData, currentSectionIndex) => {
         : μs2Frame(maxTimeLineOut, 30);
 };
 
+const getVideoFrameList = () => { };
+
 export default {
     calcTimeLineContainerWidth,
     frame2Time,
@@ -462,6 +471,7 @@ export default {
     getMaxFrameWidth,
     getFitFrameWidth,
     μs2Frame,
+    frame2ms,
     getVideoItemWidth,
     getMaxFrameOfMaterial
 };

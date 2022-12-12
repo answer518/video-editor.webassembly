@@ -100,7 +100,7 @@ const addVideoToCoreData = (coreData, videoFileList, currentSectionIndex) =>
                 // );
             }
 
-            // 将 tempVisionTrackMaterials 加入 coreDataa
+            // 将 tempVisionTrackMaterials 加入 coreData
             for (let i = 0; i < tempVisionTrackMaterials.length; i++) {
                 coreData.sections[
                     currentSectionIndex - 1
@@ -109,7 +109,7 @@ const addVideoToCoreData = (coreData, videoFileList, currentSectionIndex) =>
                 );
             }
 
-            console.log("addVideoToCoreData success");
+            console.log("addVideoToCoreData success", coreData);
             resolve();
         } catch (error) {
             console.log("addVideoToCoreData error", error);

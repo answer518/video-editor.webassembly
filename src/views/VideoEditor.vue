@@ -64,6 +64,7 @@ import { inject, ref } from "vue";
 import Mapping from "@/map";
 import Api from "@/api";
 import { VideoEditor } from "@/viewmodels";
+import WASM from "@/wasm";
 
 // 核心数据
 const coreData = inject(Store.coreData);
@@ -113,6 +114,13 @@ const currentSectionIndex = inject(Store.currentSectionIndex);
 // 视频选择器 input type=file
 const videoInputElement = ref(null);
 
+// 读帧的 Worker
+const readFrameWorker = inject(Store.readFrameWorker);
+
+// 临时存放视频帧的列表
+const videoFrameList = inject(Store.videoFrameList);
+const currentFile = inject(Store.currentFile);
+
 // 视频上传 Callback
 const addVideoOnCurrentSection = (e) => {
   VideoEditor.addVideoOnCurrentSection(
@@ -124,6 +132,8 @@ const addVideoOnCurrentSection = (e) => {
     currentSectionIndex,
     videoInputElement
   );
+
+  currentFile.value = e.target.files[0];
 };
 
 // 清空当前预览器的视频
